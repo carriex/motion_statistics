@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch, torchvision
 import model
 import os
+import time
 from dataset import UCF101DataSet
 from tensorboardX import SummaryWriter
 from torch.utils.tensorboard import SummaryWriter 
@@ -12,14 +13,14 @@ base_lr = 0.001
 momentum = 0.9 
 batch_size = 30
 num_classes = 14
-num_epoches = 20
+num_epoches = 18
 weight_decay = 0.005
 framelist_file = 'list/rgb_list.list'
 v_flow_list_file='list/v_flow_list.list'
 u_flow_list_file='list/u_flow_list.list'
 clip_len = 16
 model_dir = 'models'
-model_name = 'c3d.pth'
+model_name = 'c3d-motion.pth'
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 
@@ -44,6 +45,7 @@ def train():
 
 	#define loss function (MSE loss)
 	criterion = nn.MSELoss()
+	criterion.to(device)
 
 
 	#define optimizer 
@@ -51,7 +53,7 @@ def train():
 
 	#lr is divided by 10 after every 4 epoches 
 	
-	scheduler = optim.lr_scheduler.StepLR(optimizer,step_size=5, gamma=0.1)
+	scheduler = optim.lr_scheduler.StepLR(optimizer,step_size=6, gamma=0.1)
 
 	writer = SummaryWriter()
 
@@ -61,6 +63,7 @@ def train():
 		scheduler.step() #last_epoch default is -1
 
 		for i, data in enumerate(trainloader, 0):
+
 			step = epoch * len(trainloader) + i
 			inputs, labels = data['clip'].to(device,dtype=torch.float), data['label'].to(device)
 			optimizer.zero_grad()
@@ -92,6 +95,7 @@ def get_default_device():
 		return torch.device('cuda:0')
 	else:
 		return torch.device('cpu')
+
 
 
 def main():
