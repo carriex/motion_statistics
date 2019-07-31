@@ -9,7 +9,7 @@ test_list = 'list/test_ucf101.list'
 batch_size = 12
 num_classes = 101 
 model_dir = 'models'
-model_name = 'c3d.pth-30'
+model_name = 'c3d-finetune.pth-60000'
 
 def eval():
 	
@@ -38,10 +38,6 @@ def eval():
 
 	total_accuracy = np.array(total_accuracy)
 	total_predict_label = np.array(total_predict_label)
-	np.savetxt('results/total_accuracy.txt', total_accuracy, fmt = "%.6f")
-    np.save('results/total_accuray.npy', total_accuracy)
-    np.savetxt('results/predict_label_total.txt', total_predict_label, fmt="%d")
-    np.save('results/predict_label_total.npy', total_predict_label)
     print(np.mean(total_accuracy))
 
 

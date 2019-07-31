@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 base_lr = 0.001
 momentum = 0.9 
-batch_size = 1
+batch_size = 30
 num_classes = 14
 num_epoches = 18
 weight_decay = 0.005
@@ -20,14 +20,14 @@ v_flow_list_file='list/v_flow_list.list'
 u_flow_list_file='list/u_flow_list.list'
 clip_len = 16
 model_dir = 'models'
-model_name = 'c3d-motion.pth'
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+model_name = 'c3d-motion-new.pth'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
 
 def train():
 
 	#initialize the model
-	c3d = model.C3D(num_classes)
+	c3d = model.C3D(num_classes,pretrain=True)
 
 	train_param = [
 					{'params':c3d.get_1x_lr_param()},

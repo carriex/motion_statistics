@@ -8,9 +8,10 @@ import torch.nn.functional as F
 
 
 class C3D(nn.Module):
-	def __init__(self,num_classes):
+	def __init__(self,num_classes,pretrain=False):
 		super(C3D,self).__init__()
 
+		self.pretrain = pretrain
 
 		self.conv1 = nn.Conv3d(3, 64, 3, padding=1)
 
@@ -54,10 +55,11 @@ class C3D(nn.Module):
 		x = self.pool5(F.relu(self.conv5(x)))
 		x = x.view(-1, 256*1*4*4)
 		x = F.relu(self.fc1(x))
-		x = self.dropout(x)
+		if self.pretrain == False:
+			x = self.dropout(x)
 		x = F.relu(self.fc2(x))
-		x = self.dropout(x)
-		#x = self.softmax(x)
+		if self.pretrain == False:
+			x = self.dropout(x)
 		x = self.out(x)	
 
 		return x 
