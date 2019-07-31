@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 base_lr = 0.001
 momentum = 0.9 
-batch_size = 30
+batch_size = 1
 num_classes = 14
 num_epoches = 18
 weight_decay = 0.005
