@@ -31,8 +31,6 @@ class UCF101DataSet(Dataset):
 	def __getitem__(self, idx):
 
 		start_time = time.time()
-
-		
 		data = self.datalist[idx]
 		np_mean = np.load("ucf101_volume_mean_official.npy") 
 		frame_data,v_flow_data,u_flow_data = self.load_clip_data(data)
@@ -49,12 +47,11 @@ class UCF101DataSet(Dataset):
 		
 		label = self.compute_motion_label(v_flow_data, u_flow_data)
 		
-		duration = time.time() - start_time
-		print('Read data time %.3f sec' % (duration))
-
-
 
 		clip,label = self.to_tensor(frame_data,label)
+		duration = time.time() - start_time 
+
+		print('Read data time %.3f' % duration)
 
 		sample = {'clip':clip, 'label':label}
 
@@ -81,7 +78,6 @@ class UCF101DataSet(Dataset):
 		frame, v_flow, u_flow = data 
 		frame_dir, start_frame = frame[0], int(frame[1])
 		v_flow_dir,u_flow_dir = v_flow[0], u_flow[0]
-		print(v_flow_dir, u_flow_dir, start_frame)
 		frame_data, v_flow_data, u_flow_data = [], [], []
 		for i in range(self.clip_len):
 			frame = self.read_img(frame_dir,start_frame,i)
@@ -416,9 +412,9 @@ class UCF101DataSet(Dataset):
 		if k == 27:
 			cv2.destroyAllWindows()
 
-
 '''
-trainset = UCF101DataSet(framelist_file='list/rgb_list.list', v_flow_list_file='list/v_flow_list.list', u_flow_list_file='list/u_flow_list.list',clip_len=16, crop_size=112,split="testing")
+
+trainset = UCF101DataSet(framelist_file='list/rgb_train_linux.list', v_flow_list_file='list/v_flow_train_linux.list', u_flow_list_file='list/u_flow_train_linux.list',clip_len=16, crop_size=112,split="training")
 
 
 for i, data in enumerate(trainset):
@@ -426,6 +422,7 @@ for i, data in enumerate(trainset):
 	if i == 9:
 		break
 '''
+
 
 	
 

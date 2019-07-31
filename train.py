@@ -6,7 +6,6 @@ import os
 import time
 from dataset import UCF101DataSet
 from tensorboardX import SummaryWriter
-from torch.utils.tensorboard import SummaryWriter 
 
 
 base_lr = 0.001
@@ -15,9 +14,9 @@ batch_size = 30
 num_classes = 14
 num_epoches = 18
 weight_decay = 0.005
-framelist_file = 'list/rgb_list.list'
-v_flow_list_file='list/v_flow_list.list'
-u_flow_list_file='list/u_flow_list.list'
+framelist_file = 'list/rgb_train_linux.list'
+v_flow_list_file='list/v_flow_train_linux.list'
+u_flow_list_file='list/u_flow_train_linux.list'
 clip_len = 16
 model_dir = 'models'
 model_name = 'c3d-motion.pth'
@@ -34,6 +33,7 @@ def train():
 					{'params':c3d.get_2x_lr_param(), 'lr': base_lr*2}]
 
 	device = get_default_device()
+	print(device)
 
 	#import input data
 	trainset = UCF101DataSet(framelist_file=framelist_file, v_flow_list_file=v_flow_list_file, u_flow_list_file=u_flow_list_file,clip_len=clip_len, crop_size=112,split="training")
