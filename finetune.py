@@ -47,6 +47,7 @@ def train():
 
 
 	device = get_default_device()
+
 	#import input data
 	trainset = UCF101(datalist_file=train_list, clip_len=16, crop_size=112,split="training")
 	trainloader = torch.utils.data.DataLoader(trainset,batch_size=batch_size,shuffle=True,num_workers=10)
