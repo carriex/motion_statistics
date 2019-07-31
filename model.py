@@ -39,7 +39,10 @@ class C3D(nn.Module):
 
 		self.out = nn.Linear(2048, num_classes)	#num of classes are output dimension for pretrain
 
-		self.dropout = nn.Dropout(p=0.5)
+		if self.pretrain:
+			self.dropout = nn.Dropout(p=0)
+		else:
+			self.dropout = nn.Dropout(p=0.5)
 
 		self.softmax = nn.Softmax()
 
@@ -55,11 +58,9 @@ class C3D(nn.Module):
 		x = self.pool5(F.relu(self.conv5(x)))
 		x = x.view(-1, 256*1*4*4)
 		x = F.relu(self.fc1(x))
-		if self.pretrain == False:
-			x = self.dropout(x)
+		x = self.dropout(x)
 		x = F.relu(self.fc2(x))
-		if self.pretrain == False:
-			x = self.dropout(x)
+		x = self.dropout(x)
 		x = self.out(x)	
 
 		return x 

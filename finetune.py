@@ -29,8 +29,13 @@ def train():
 	model_path = os.path.join(model_dir, pretrained_model)
 	c3d = model.C3D(num_classes)
 
-	#load conv layer param from pre-trained model
-	pretrained_param = torch.load(model_path)
+	device = get_default_device()
+
+	if device == torch.device('cpu'):
+		pretrained_param = torch.load(model_path,map_location='cpu')
+	else:
+		pretrained_param = torch.load(model_path)
+
 	to_load = {}
 
 	for key in pretrained_param.keys():
@@ -46,7 +51,6 @@ def train():
 					{'params': c3d.get_2x_lr_param(), 'lr': base_lr * 2}]
 
 
-	device = get_default_device()
 
 	#import input data
 	trainset = UCF101(datalist_file=train_list, clip_len=16, crop_size=112,split="training")
