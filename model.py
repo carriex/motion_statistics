@@ -11,6 +11,7 @@ class C3D(nn.Module):
 	def __init__(self,num_classes):
 		super(C3D,self).__init__()
 
+
 		self.conv1 = nn.Conv3d(3, 64, 3, padding=1)
 
 		self.pool1 = nn.MaxPool3d((1, 2, 2), ceil_mode=True)
