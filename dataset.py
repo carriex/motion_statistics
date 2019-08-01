@@ -146,7 +146,7 @@ class UCF101DataSet(Dataset):
 
 
 	def to_tensor(self,clip,label):
-		return torch.from_numpy(clip.transpose((3,0,1,2))),torch.from_numpy(np.array(label).astype(np.float32))
+		return torch.from_numpy(clip.transpose((3,0,1,2))),torch.from_numpy(np.array(label))
 
 	def compute_motion_label(self, v_flow_data, u_flow_data):
 		"""
