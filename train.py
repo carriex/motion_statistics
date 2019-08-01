@@ -82,7 +82,7 @@ def train():
 				running_loss = 0.0 
 			if step % 10000 == 9999:
 				torch.save(c3d.state_dict(),
-					       os.path.join(constant.MODEL_DIR,'%s-%d'%(constant.TRAIN_MODEL_NAME, step+1)))
+					       os.path.join(constant.MODEL_DIR,'%s-%d'%(constant.PRETRAIN_MODEL_NAME, step+1)))
 
 	print('Finished Training')
 	writer.close()

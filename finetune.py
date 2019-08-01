@@ -89,7 +89,7 @@ def train():
 			optimizer.step()
 
 			running_loss +=loss.item()
-			print('Step %d, loss: %.3f' %(i, loss.item()))
+			print('Step %d, loss: %.3f' %(step, loss.item()))
 			writer.add_scalar('Train/Loss', loss.item(),step)
 			
 
