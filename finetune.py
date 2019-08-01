@@ -4,19 +4,11 @@ import torch
 import model
 import numpy as np
 import os
+import constant
+from dataset import UCF101DataSet
+from utils import get_default_device
 from tensorboardX import SummaryWriter
-from dataset import UCF101
 
-base_lr = 0.001
-momentum = 0.9 
-batch_size = 30
-num_classes = 101
-num_epoches = 18
-weight_decay = 0.005
-train_list = 'list/rgb_train_linux.list'
-model_dir = 'models'
-pretrained_model = 'c3d-motion.pth-60000'
-model_name = 'c3d-finetune.pth'
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
@@ -25,9 +17,9 @@ os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
 def train():
 
-	#create the network 
-	model_path = os.path.join(model_dir, pretrained_model)
-	c3d = model.C3D(num_classes)
+	#initialize the model
+	model_path = os.path.join(constant.MODEL_DIR, constant.PRETRAINED_MODEL)
+	c3d = model.C3D(constant.NUM_CLASSES)
 
 	device = get_default_device()
 
@@ -47,14 +39,16 @@ def train():
 
 	c3d.load_state_dict(to_load)
 
-	train_params = [{'params': c3d.get_1x_lr_param(), 'lr': base_lr},
-					{'params': c3d.get_2x_lr_param(), 'lr': base_lr * 2}]
+	train_params = [{'params': c3d.get_1x_lr_param(), 'lr': constant.BASE_LR},
+					{'params': c3d.get_2x_lr_param(), 'lr': constant.BASE_LR * 2}]
 
 
 
 	#import input data
-	trainset = UCF101(datalist_file=train_list, clip_len=16, crop_size=112,split="training")
-	trainloader = torch.utils.data.DataLoader(trainset,batch_size=batch_size,shuffle=True,num_workers=10)
+	trainset = UCF101DataSet(framelist_file=constant.TRAIN_LIST, clip_len=constant.CLIP_LENGTH, 
+		                     crop_size=constant.CROP_SIZE, split="training")
+	trainloader = torch.utils.data.DataLoader(trainset, batch_size=constant.TRAIN_BATCH_SIZE,
+		                                      shuffle=True, num_workers=10)
 	
 
 	c3d.to(device, non_blocking=True,dtype=torch.float)
@@ -66,15 +60,17 @@ def train():
 
 
 	#define optimizer 
-	optimizer = optim.SGD(train_params, lr=base_lr, momentum=momentum, weight_decay=weight_decay)
+	optimizer = optim.SGD(train_params, lr=constant.BASE_LR, 
+		                  momentum=constant.MOMENTUM, weight_decay=constant.WEIGHT_DECAY)
 
-	#lr is divided by 10 after every 4 epoches 
+	#define lr schedule
 	
-	scheduler = optim.lr_scheduler.StepLR(optimizer,step_size=6, gamma=0.1)
+	scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=constant.LR_DECAY_STEP_SIZE, 
+		                                             gamma=constant.LR_DECAY_GAMMA)
 	writer = SummaryWriter()
 
 
-	for epoch in range(num_epoches):
+	for epoch in range(constant.NUM_EPOCHES):
 		
 		running_loss = 0.0
 		running_accuracy = 0.0
@@ -83,7 +79,7 @@ def train():
 
 		for i, data in enumerate(trainloader, 0):
 			step = epoch * len(trainloader) + i
-			inputs, labels = data['clip'].to(device,dtype=torch.float), data['label'].to(device) 
+			inputs, labels = data['clip'].to(device, dtype=torch.float), data['label'].to(device=device, dtype=torch.int64) 
 			optimizer.zero_grad()
 
 			
@@ -100,7 +96,7 @@ def train():
 			outputs = nn.Softmax(dim=1)(outputs)
 			_, predict_label = outputs.max(1)
 			correct = (predict_label == labels).sum().item()
-			accuracy = float(correct) / float(batch_size)
+			accuracy = float(correct) / float(constant.TRAIN_BATCH_SIZE)
 			running_accuracy+=accuracy
 			writer.add_scalar('Train/Accuracy', accuracy,step)
 
@@ -115,17 +111,12 @@ def train():
 				running_loss = 0.0 
 				running_accuracy = 0.0
 			if step % 10000 == 9999:
-				torch.save(c3d.state_dict(),os.path.join(model_dir,'%s-%d'%(model_name, step+1)))
+				torch.save(c3d.state_dict(),os.path.join(model_dir,'%s-%d'%(constant.TRAIN_MODEL_NAME, step+1)))
 
 		
 	print('Finished Training')
 	writer.close()
 
-def get_default_device():
-	if torch.cuda.is_available():
-		return torch.device('cuda:0')
-	else:
-		return torch.device('cpu')
 
 
 

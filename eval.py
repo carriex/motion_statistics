@@ -4,36 +4,36 @@ import torch
 import model
 import os
 import numpy as np
-from dataset import UCF101
-
-test_list = 'list/test_ucf101.list'
-batch_size = 12
-num_classes = 101 
-model_dir = 'models'
-model_name = 'c3d-finetune.pth-60000'
+from dataset import UCF101DataSet
+from utils import get_default_device
+import constant
 
 def eval():
 	
-	model_path = os.path.join(model_dir,model_name)
+	model_path = os.path.join(constant.MODEL_DIR,constant.TRAINED_MODEL)
 	device = get_default_device()
-	c3d = model.C3D(num_classes)
+	c3d = model.C3D(constant.NUM_CLASSES)
 	c3d.load_state_dict(torch.load(model_path))
 	c3d.to(device, non_blocking=True,dtype=torch.float)
 	c3d.eval()
 
-	testset = UCF101(datalist_file=test_list, clip_len=16, crop_size=112,split="testing")
-	testloader = torch.utils.data.DataLoader(testset,batch_size=batch_size,shuffle=True,num_workers=4) 
+	testset = UCF101DataSet(framelist_file=constant.TEST_LIST, 
+		                    clip_len=constant.CLIP_LENGTH, 
+		                    crop_size=constant.CROP_SIZE, split="testing")
+	testloader = torch.utils.data.DataLoader(testset, batch_size=constant.TEST_BATCH_SIZE, shuffle=True, num_workers=4) 
 
 	total_predict_label = []
 	total_accuracy = [] 
 
 	for (i, data) in enumerate(testloader, 0):
-		inputs, labels = data['clip'].to(device,dtype=torch.float), data['label'].to(device)
+		inputs, labels = data['clip'].to(device, dtype=torch.float), data['label'].to(device)
 		_, outputs = c3d(inputs).max(1)
+
 		total = labels.size(0)
 		correct = (outputs == labels).sum().item()
 		accuracy = float(correct) / float(total)
 		print("iteration %d, accuracy = %g" % (i, accuracy))
+		
 		total_predict_label.append(outputs)
 		total_accuracy.append(accuracy)
 
@@ -41,12 +41,7 @@ def eval():
 	total_predict_label = np.array(total_predict_label)
 
 
-def get_default_device():
-	if torch.cuda.is_available():
-		return torch.device('cuda:0')
-	else:
-		return torch.device('cpu')
-
+	print("Final accuracy", np.mean(total_accuracy))
 
 
 def main():
