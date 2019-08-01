@@ -3,7 +3,8 @@ import torch.nn as nn
 import torch
 import model
 import os
-from dataset import UCF101DataSet
+import numpy as np
+from dataset import UCF101
 
 test_list = 'list/test_ucf101.list'
 batch_size = 12
@@ -20,7 +21,7 @@ def eval():
 	c3d.to(device, non_blocking=True,dtype=torch.float)
 	c3d.eval()
 
-	testset = UCF101DataSet(datalist_file=test_list, clip_len=16, crop_size=112,split="testing")
+	testset = UCF101(datalist_file=test_list, clip_len=16, crop_size=112,split="testing")
 	testloader = torch.utils.data.DataLoader(testset,batch_size=batch_size,shuffle=True,num_workers=4) 
 
 	total_predict_label = []
@@ -31,14 +32,13 @@ def eval():
 		_, outputs = c3d(inputs).max(1)
 		total = labels.size(0)
 		correct = (outputs == labels).sum().item()
-		accuracy = correct / total
+		accuracy = float(correct) / float(total)
 		print("iteration %d, accuracy = %g" % (i, accuracy))
 		total_predict_label.append(outputs)
 		total_accuracy.append(accuracy)
 
 	total_accuracy = np.array(total_accuracy)
 	total_predict_label = np.array(total_predict_label)
-    print(np.mean(total_accuracy))
 
 
 def get_default_device():

@@ -35,7 +35,6 @@ def train():
 	device = get_default_device()
 	print(device)
 
-	print(c3d)
 
 	#import input data
 	trainset = UCF101DataSet(framelist_file=framelist_file, v_flow_list_file=v_flow_list_file, u_flow_list_file=u_flow_list_file,clip_len=clip_len, crop_size=112,split="training")
