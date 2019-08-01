@@ -2,7 +2,7 @@ BASE_LR = 0.001
 MOMENTUM = 0.9 
 NUM_EPOCHES = 18
 WEIGHT_DECAY = 0.005
-TRAIN_BATCH_SIZE = 1
+TRAIN_BATCH_SIZE = 30
 TEST_BATCH_SIZE = 12
 LR_DECAY_STEP_SIZE = 6
 LR_DECAY_GAMMA = 0.1
@@ -16,12 +16,13 @@ RESIZE_H = 171
 RESIZE_W = 128
 
 TEST_LIST = 'list/test_ucf101.list'
-TRAIN_LIST = 'list/rgb_list.list'
-FRAMELIST_FILE = 'list/rgb_list.list'
-V_FLOW_LIST_FILE = 'list/v_flow_list.list'
-U_FLOW_LIST_FILE = 'list/u_flow_list.list'
+TRAIN_LIST = 'list/rgb_train_linux.list'
+FRAMELIST_FILE = 'list/rgb_train_linux.list'
+V_FLOW_LIST_FILE = 'list/v_flow_train_linux.list'
+U_FLOW_LIST_FILE = 'list/u_flow_train_linux.list'
 MODEL_DIR = 'models'
 TRAINED_MODEL = 'c3d-finetune.pth-60000'
-TRAIN_MODEL_NAME = 'c3d-finetune.pth'
+TRAIN_MODEL_NAME = 'c3d-finetune-new.pth'
 PRETRAINED_MODEL = 'c3d-motion.pth-60000'
 PRETRAIN_MODEL_NAME = 'c3d-motion-new.pth'
+
