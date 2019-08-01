@@ -8,8 +8,9 @@ import constant
 from dataset import UCF101DataSet
 from utils import get_default_device
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '2'
 
+print('CUDA Device: ', os.environ["CUDA_VISIBLE_DEVICES"])
 
 def train():
 
@@ -55,7 +56,6 @@ def train():
 
     for epoch in range(constant.NUM_EPOCHES):
 
-        running_loss = 0.0
         scheduler.step()
 
         for i, data in enumerate(trainloader, 0):
@@ -71,10 +71,8 @@ def train():
 
             optimizer.step()
 
-            if i % 100 == 99:
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / 100))
-                running_loss = 0.0
+            print('[%d, %5d] loss: %.3f' %
+                  (epoch + 1, i + 1, loss.item()))
             if step % 10000 == 9999:
                 torch.save(c3d.state_dict(),
                            os.path.join(constant.MODEL_DIR, '%s-%d' % (constant.PRETRAIN_MODEL_NAME, step+1)))
