@@ -81,7 +81,7 @@ class UCF101DataSet(Dataset):
         for i in range(num_of_frame):
             frame = self.read_img(frame_dir, start_frame, i)
             frame_data.append(frame)
-        frame_data = np.array(frame_data).astype(np.float32)
+        frame_data = np.array(frame_data).astype(np.uint8)
         return frame_data
 
     def read_frame_label(self, framelist_data):
@@ -358,6 +358,7 @@ class UCF101DataSet(Dataset):
 
 '''
 trainset = UCF101DataSet(framelist_file='list/rgb_list.list', v_flow_list_file='list/v_flow_list.list', u_flow_list_file='list/u_flow_list.list',clip_len=16, crop_size=112,split="training")
+
 trainset = UCF101DataSet(framelist_file='list/rgb_list.list', clip_len=16, crop_size=112,split="training")
 
 
@@ -366,3 +367,4 @@ for i, data in enumerate(trainset):
 	if i == 9:
 		break
 '''
+

@@ -1,4 +1,6 @@
 import torch
+import numpy as np
+import cv2
 
 
 
@@ -8,7 +10,7 @@ def get_default_device():
 	else:
 		return torch.device('cpu')
 
-def write_motion_boundary(self,frame,mag,ang,title):
+def write_motion_boundary(frame,mag,ang,title):
 	'''
 	H [0, 180] - Different color (largest is red)
 	S [0, 255] - Different color intensity 
@@ -21,10 +23,10 @@ def write_motion_boundary(self,frame,mag,ang,title):
 	hsv[...,0] = ang/2				#H - different color 
 	hsv[...,1] = cv2.normalize(mag, None, 0, 255,cv2.NORM_MINMAX)	#S
 	bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
-	cv2.imwrite(title,bgr)
+	cv2.imwrite(title+'.jpg',bgr)
 
 
-def show_image(self,img):
+def show_image(img):
 	cv2.imshow('img', img)
 	k = cv2.waitKey(0)
 	if k == 27:
