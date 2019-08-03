@@ -5,20 +5,23 @@ import torch
 from tensorboardX import SummaryWriter
 import model
 import constant
+import numpy as np
 from dataset import UCF101DataSet
 from utils import get_default_device
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '2'
-
 print('CUDA Device: ', os.environ["CUDA_VISIBLE_DEVICES"])
+
 
 def train():
 
     # initialize the model
     c3d = model.C3D(constant.NUM_MOTION_LABEL, pretrain=True)
 
-    train_param = [{'params': c3d.get_1x_lr_param()},
-                   {'params': c3d.get_2x_lr_param(), 'lr': constant.BASE_LR*2}]
+    train_param = [{'params': c3d.get_fc_1x_lr_param(), 'weight_decay':constant.WEIGHT_DECAY},
+            {'params': c3d.get_fc_2x_lr_param(), 'lr': constant.BASE_LR*2},
+                   {'params': c3d.get_conv_1x_lr_param()},
+                   {'params': c3d.get_conv_2x_lr_param(), 'lr': constant.BASE_LR*2}]
 
     device = get_default_device()
 
@@ -32,24 +35,23 @@ def train():
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=constant.TRAIN_BATCH_SIZE,
                                               shuffle=True, num_workers=10)
-
-    c3d.to(device, non_blocking=True, dtype=torch.float)
     c3d.train()
+    c3d.to(device, non_blocking=True, dtype=torch.float)
 
     # define loss function (MSE loss)
-    criterion = nn.MSELoss(reduction="mean")
+    criterion = nn.MSELoss()
     criterion.to(device)
 
     # define optimizer
     optimizer = optim.SGD(train_param, lr=constant.BASE_LR,
-                          momentum=constant.MOMENTUM,
-                          weight_decay=constant.WEIGHT_DECAY)
+                          momentum=constant.MOMENTUM)
+
 
     # lr is divided by 10 after every 4 epoches
 
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=constant.LR_DECAY_STEP_SIZE,
                                           gamma=constant.LR_DECAY_GAMMA)
-
+    
     writer = SummaryWriter()
 
     print(constant.PRETRAIN_MODEL_NAME)
@@ -64,12 +66,13 @@ def train():
             inputs, labels = data['clip'].to(
                 device, dtype=torch.float), data['label'].to(device)
             optimizer.zero_grad()
-
+            
             outputs = c3d(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
-
             optimizer.step()
+
+            
 
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, loss.item()))

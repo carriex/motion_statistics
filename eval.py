@@ -35,8 +35,6 @@ def eval():
         _, outputs = c3d(inputs).max(1)
 
         total = labels.size(0)
-        print(outputs)
-        print(labels)
         correct = (outputs == labels).sum().item()
         accuracy = float(correct) / float(total)
         print("iteration %d, accuracy = %g" % (i, accuracy))

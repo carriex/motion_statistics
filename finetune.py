@@ -19,6 +19,8 @@ def train():
     model_path = os.path.join(constant.MODEL_DIR, constant.PRETRAINED_MODEL)
     c3d = model.C3D(constant.NUM_CLASSES)
 
+    print(model_path)
+
     device = get_default_device()
 
     if device == torch.device('cpu'):
@@ -36,8 +38,11 @@ def train():
 
     c3d.load_state_dict(to_load)
 
-    train_params = [{'params': c3d.get_1x_lr_param(), 'lr': constant.BASE_LR},
-                    {'params': c3d.get_2x_lr_param(), 'lr': constant.BASE_LR * 2}]
+
+    train_params = [{'params': c3d.get_conv_1x_lr_param(), 'lr': constant.BASE_LR},
+                    {'params': c3d.get_conv_2x_lr_param(), 'lr': constant.BASE_LR * 2},
+                    {'params': c3d.get_fc_1x_lr_param(), 'lr':constant.BASE_LR},
+                    {'params': c3d.get_fc_2x_lr_param(), 'lr':constant.BASE_LR *2}]
 
     # import input data
     trainset = UCF101DataSet(framelist_file=constant.TRAIN_LIST, clip_len=constant.CLIP_LENGTH,
@@ -55,7 +60,8 @@ def train():
     # define optimizer
     optimizer = optim.SGD(train_params, lr=constant.BASE_LR,
                           momentum=constant.MOMENTUM, weight_decay=constant.WEIGHT_DECAY)
-
+    
+    print(optimizer.state_dict())
     # define lr schedule
 
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=constant.LR_DECAY_STEP_SIZE,
@@ -79,6 +85,7 @@ def train():
             loss.backward()
             optimizer.step()
 
+
             running_loss += loss.item()
             print('Step %d, loss: %.3f' % (i, loss.item()))
             writer.add_scalar('Train/Loss', loss.item(), step)
@@ -101,7 +108,7 @@ def train():
                 running_accuracy = 0.0
             if step % 10000 == 9999:
                 torch.save(c3d.state_dict(), os.path.join(
-                    model_dir, '%s-%d' % (constant.TRAIN_MODEL_NAME, step+1)))
+                    constant.MODEL_DIR, '%s-%d' % (constant.TRAIN_MODEL_NAME, step+1)))
 
     print('Finished Training')
     writer.close()

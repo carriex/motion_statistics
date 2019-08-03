@@ -36,12 +36,12 @@ class UCF101DataSet(Dataset):
         crop_x, crop_y = self.get_crop_x_y(frame_data)
         frame_data = self.crop(frame_data, crop_x, crop_y)
 
-        mirror = 1
 
         if self.split == "training":
-            mirror = np.random.randint(0, 2)
-            if mirror == 0:
-                frame_data = self.flip(frame_data)
+            if self.v_flow_list_file is None and self.u_flow_list_file is None:
+                mirror = np.random.randint(0, 2)
+                if mirror == 0:
+                    frame_data = self.flip(frame_data)
 
         if self.v_flow_list_file and self.u_flow_list_file:
             v_flow_data = self.load_clip_data(
@@ -50,9 +50,6 @@ class UCF101DataSet(Dataset):
                 self.u_flow_list[idx], self.clip_len-1)
             v_flow_data = self.crop(v_flow_data, crop_x, crop_y)
             u_flow_data = self.crop(u_flow_data, crop_x, crop_y)
-            if mirror == 0:
-                v_flow_data, u_flow_data = self.flip(
-                    v_flow_data), self.flip(u_flow_data)
             label = self.compute_motion_label(v_flow_data, u_flow_data)
         else:
             label = self.read_frame_label(self.framelist[idx])
@@ -84,7 +81,7 @@ class UCF101DataSet(Dataset):
         for i in range(num_of_frame):
             frame = self.read_img(frame_dir, start_frame, i)
             frame_data.append(frame)
-        frame_data = np.array(frame_data).astype(np.uint8)
+        frame_data = np.array(frame_data).astype(np.float32)
         return frame_data
 
     def read_frame_label(self, framelist_data):
@@ -207,6 +204,7 @@ class UCF101DataSet(Dataset):
         for i, frame in enumerate(flow_data):
             frame = frame[..., 0]  # gray scale
             frame = frame.astype(np.float32)
+            frame = ((frame * 40.) / 255.) - 20
             x_filter = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
             y_filter = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
             frame_dx = ndimage.convolve(frame, x_filter)

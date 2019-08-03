@@ -41,7 +41,6 @@ class C3D(nn.Module):
 
         self.dropout = nn.Dropout(p=0.5)
 
-        self.softmax = nn.Softmax()
 
         self.init_weights()
 
@@ -68,7 +67,7 @@ class C3D(nn.Module):
         for name, m in self.named_modules():
             if type(m) == nn.Conv3d:
                 nn.init.normal_(m.weight, std=0.01)
-                nn.init.constant_(m.bias, 1.0)
+                nn.init.constant_(m.bias, 0.0)
             if type(m) == nn.Linear:
                 if name == 'out':
                     nn.init.constant_(m.bias, 0.0)
@@ -77,12 +76,29 @@ class C3D(nn.Module):
                     nn.init.constant_(m.bias, 1.0)
                     nn.init.normal_(m.weight, std=0.005)
 
-    def get_1x_lr_param(self):
+    def get_conv_1x_lr_param(self):
         for name, param in self.named_parameters():
-            if name in ['weight']:
+            if 'weight' in name and 'conv' in name and param.requires_grad:
                 yield param
 
-    def get_2x_lr_param(self):
+    def get_conv_2x_lr_param(self):
         for name, param in self.named_parameters():
-            if name in ['bias']:
+            if 'bias' in name and 'conv' in name and param.requires_grad:
                 yield param
+
+    def get_fc_1x_lr_param(self):
+        for name, param in self.named_parameters():
+            if 'conv' not in name and 'weight' in name and param.requires_grad:
+                yield param
+
+    def get_fc_2x_lr_param(self):
+        for name, param in self.named_parameters():
+            if 'conv' not in name and 'bias' in name and param.requires_grad:
+                yield param
+
+
+
+
+
+
+
