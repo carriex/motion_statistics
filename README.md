@@ -2,7 +2,6 @@
 PyTorch implementation of self-supervised learning with motion statistics labels 
 
 ## Notes
-0. No normalization is done on u_flow and v_flow value
 1. Separation on pattern three has no overlapping points 
 2. During pre-train:
 - num of epoch = 18 
