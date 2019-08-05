@@ -342,14 +342,14 @@ class UCF101DataSet(Dataset):
                            for idx_y in range(start_y, end_y)]
                 if start_x == start_y:
                     pattern_data.append([data[idx_x][idx_y] for (
-                        idx_x, idx_y) in indices if idx_x > idx_y])
+                        idx_x, idx_y) in indices if idx_x >= idx_y])
                     pattern_data.append([data[idx_x][idx_y] for (
                         idx_x, idx_y) in indices if idx_x <= idx_y])
                 else:
                     pattern_data.append([data[idx_x][idx_y] for (
                         idx_x, idx_y) in indices if idx_x <= y - idx_y])
                     pattern_data.append([data[idx_x][idx_y] for (
-                        idx_x, idx_y) in indices if idx_x > y - idx_y])
+                        idx_x, idx_y) in indices if idx_x >= y - idx_y])
                 start_y = end_y
             start_x = end_x
 

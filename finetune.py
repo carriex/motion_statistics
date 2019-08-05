@@ -38,6 +38,8 @@ def train():
 
     c3d.load_state_dict(to_load)
 
+    print(c3d.state_dict())
+
 
     train_params = [{'params': c3d.get_conv_1x_lr_param(), 'lr': constant.BASE_LR},
                     {'params': c3d.get_conv_2x_lr_param(), 'lr': constant.BASE_LR * 2},

@@ -8,6 +8,7 @@ from dataset import UCF101DataSet
 from utils import get_default_device
 import constant
 
+os.environ["CUDA_VISIBLE_DEVICES"] = '2'
 
 def eval():
 
@@ -24,7 +25,7 @@ def eval():
                             clip_len=constant.CLIP_LENGTH,
                             crop_size=constant.CROP_SIZE, split="testing")
     testloader = torch.utils.data.DataLoader(
-        testset, batch_size=constant.TEST_BATCH_SIZE, shuffle=True, num_workers=4)
+        testset, batch_size=constant.TEST_BATCH_SIZE, shuffle=False, num_workers=8)
 
     total_predict_label = []
     total_accuracy = []
@@ -44,7 +45,8 @@ def eval():
 
     total_accuracy = np.array(total_accuracy)
     total_predict_label = np.array(total_predict_label)
-
+    
+    print(model_path)
     print("Final accuracy", np.mean(total_accuracy))
 
 
