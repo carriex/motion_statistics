@@ -10,7 +10,6 @@ from dataset import UCF101DataSet
 from utils import get_default_device
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '2'
-print('CUDA Device: ', os.environ["CUDA_VISIBLE_DEVICES"])
 
 
 def train():

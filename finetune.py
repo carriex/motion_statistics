@@ -13,7 +13,6 @@ from tensorboardX import SummaryWriter
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '3'
 
-print('%s-%s-%d' % (constant.TRAIN_MODEL_NAME, datetime.date.today(), step+1))
 
 
 def train():
