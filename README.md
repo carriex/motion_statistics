@@ -15,7 +15,9 @@ $ pip install -r requirements.txt
 
 3. Download the UCF dataset and extract the optical flow data
 
+Resources: 
 [Download UCF101](https://www.crcv.ucf.edu/research/data-sets/ucf101/)
+
 [Extract optical flow on GPU](https://github.com/wizyoung/Optical-Flow-GPU-Docker)
 
 4. Update `constant.py` to include the filepath
