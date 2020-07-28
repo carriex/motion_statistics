@@ -1,13 +1,49 @@
 # motion_statistics
-PyTorch implementation of self-supervised learning with motion statistics labels 
+PyTorch implementation of [self-supervised learning with motion statistics labels](https://arxiv.org/abs/1904.03597).
+This implementation only uses the motion statistics mentioned in the paper.
 
-## Notes
-0. Pretrain and finetune shared same weight initialization on final FC layer with std=0.01. (Changed, not much improvement on acc)
-1. Separation on pattern three has no overlapping points (Changed, not much improvement on acc)
-2. Weight decay is applied to both weights and biases (Changed, effect TBD)
-3. During pre-train:
-- num of epoch = 18 
-- step size for learning rate decay is 6 
-4. Label is output for each video clip (16 frames):
-max_vl_p1, max_vo_p1, max_ul_p1, max_uo_p1, max_vl_p2, max_vo_p2, max_ul_p2, max_uo_p2, max_vl_p3, max_vo_p3, max_ul_p3, max_uo_p3, max(Mv), max(Mu)
+## Prerequisites 
+1. Clone the repo 
+```bash
+$ git clone https://github.com/carriex/motion_statistics.git
+```
+
+2. Install the python dependency packages 
+```bash
+$ pip install -r requirements.txt 
+```
+
+3. Download the UCF dataset and extract the optical flow data
+
+[Download UCF101](https://www.crcv.ucf.edu/research/data-sets/ucf101/)
+[Extract optical flow on GPU](https://github.com/wizyoung/Optical-Flow-GPU-Docker)
+
+4. Update `constant.py` to include the filepath
+
+## Run
+
+### Train
+
+First train with motion statistics.
+
+```bash
+python train.py 
+```
+
+### Finetune
+
+Then finetune on the label.
+
+```bash
+python fineune.py 
+```
+
+### Eval
+
+Evaluate on the UCF-101 test data.
+
+```bash
+python eval.py 
+```
+
 

@@ -36,7 +36,6 @@ class UCF101DataSet(Dataset):
         crop_x, crop_y = self.get_crop_x_y(frame_data)
         frame_data = self.crop(frame_data, crop_x, crop_y)
 
-
         if self.split == "training":
             if self.v_flow_list_file is None and self.u_flow_list_file is None:
                 mirror = np.random.randint(0, 2)
@@ -45,15 +44,14 @@ class UCF101DataSet(Dataset):
 
         if self.v_flow_list_file and self.u_flow_list_file:
             v_flow_data = self.load_clip_data(
-                self.v_flow_list[idx], self.clip_len-1)
+                self.v_flow_list[idx], self.clip_len - 1)
             u_flow_data = self.load_clip_data(
-                self.u_flow_list[idx], self.clip_len-1)
+                self.u_flow_list[idx], self.clip_len - 1)
             v_flow_data = self.crop(v_flow_data, crop_x, crop_y)
             u_flow_data = self.crop(u_flow_data, crop_x, crop_y)
             label = self.compute_motion_label(v_flow_data, u_flow_data)
         else:
             label = self.read_frame_label(self.framelist[idx])
-
 
         clip, label = self.to_tensor(frame_data, label)
 
@@ -92,7 +90,7 @@ class UCF101DataSet(Dataset):
         Read the image from the path and resize it 
         """
         img_path = os.path.join(
-            img_dir, "frame" + "{:06}.jpg".format(start_frame+i))
+            img_dir, "frame" + "{:06}.jpg".format(start_frame + i))
         img_origin = cv2.imread(img_path)
         img_resize = cv2.resize(
             img_origin, (constant.RESIZE_H, constant.RESIZE_W))
@@ -107,8 +105,8 @@ class UCF101DataSet(Dataset):
         x, y = images.shape[1:3]
         crop_size = self.crop_size
         if self.split == 'training':
-            crop_x = np.random.randint(0, x-crop_size)
-            crop_y = np.random.randint(0, y-crop_size)
+            crop_x = np.random.randint(0, x - crop_size)
+            crop_y = np.random.randint(0, y - crop_size)
         else:
             crop_x = (x - crop_size) // 2
             crop_y = (y - crop_size) // 2
@@ -124,7 +122,7 @@ class UCF101DataSet(Dataset):
         crop_images = []
         for img in images:
             img = img[crop_x:(crop_x + crop_size),
-                      crop_y:(crop_y+crop_size), :]
+                  crop_y:(crop_y + crop_size), :]
             crop_images.append(img)
         return np.array(crop_images).astype(np.uint8)
 
@@ -232,11 +230,11 @@ class UCF101DataSet(Dataset):
         mag_data_avg = np.array([np.mean(mag)
                                  for mag in mag_data]).astype(np.float32)
         max_mag_idx = np.argmax(mag_data_avg)
-        max_mag_data = np.array(mag_data[max_mag_idx]).reshape(-1,)
-        max_ang_data = np.array(ang_data[max_mag_idx]).reshape(-1,)
+        max_mag_data = np.array(mag_data[max_mag_idx]).reshape(-1, )
+        max_ang_data = np.array(ang_data[max_mag_idx]).reshape(-1, )
         max_ang_idx = self.get_dominant_orientation(max_mag_data, max_ang_data)
 
-        return max_mag_idx+1, max_ang_idx+1
+        return max_mag_idx + 1, max_ang_idx + 1
 
     def get_dominant_orientation(self, mag_data, ang_data):
         """
@@ -257,8 +255,8 @@ class UCF101DataSet(Dataset):
             lower_bin = int(ang // bin_value) % 8
             upper_bin = (lower_bin + 1) % bin_size
             lower_portion = 1 - ((ang % bin_value) / bin_value)
-            mag_bin[lower_bin] += mag_data[i]*lower_portion
-            mag_bin[upper_bin] += mag_data[i]*(1-lower_portion)
+            mag_bin[lower_bin] += mag_data[i] * lower_portion
+            mag_bin[upper_bin] += mag_data[i] * (1 - lower_portion)
 
         max_idx = np.argmax(mag_bin)
 
@@ -278,12 +276,12 @@ class UCF101DataSet(Dataset):
 
         start_x = 0
         for i in range(4):
-            end_x = min((int(0.25*x) + start_x), x)
+            end_x = min((int(0.25 * x) + start_x), x)
             start_y = 0
             for j in range(4):
-                end_y = min((int(0.25*y) + start_y), y)
+                end_y = min((int(0.25 * y) + start_y), y)
                 pattern_data.append(
-                    data[start_x:end_x, start_y:end_y].reshape(-1,))
+                    data[start_x:end_x, start_y:end_y].reshape(-1, ))
                 start_y = end_y
             start_x = end_x
 
@@ -299,24 +297,25 @@ class UCF101DataSet(Dataset):
         x = data.shape[0]
         y = data.shape[1]
         pattern_data = []
-        slice_data = []
         indices = []
 
         for i in range(4):
             start_x = i * x // 8
-            end_x = min(x, (x - i*x // 8))
+            end_x = min(x, (x - i * x // 8))
             start_y = i * y // 8
             end_y = min(y, (y - i * y // 8))
             indices.append((start_x, end_x, start_y, end_y))
         for i in range(4):
-            start_x, end_x, start_y, end_y = indices[3-i]
+            start_x, end_x, start_y, end_y = indices[3 - i]
             if i == 0:
                 pattern_data.append(
-                    data[start_x:end_x, start_y:end_y].reshape(-1,))
+                    data[start_x:end_x, start_y:end_y].reshape(-1, ))
             else:
-                last_start_x, last_end_x, last_start_y, last_end_y = indices[4-i]
-                this_data_block = list(data[start_x:last_start_x, start_y:end_y].reshape(-1,)) + list(data[last_end_x:end_x, start_y:end_y].reshape(-1,)) + list(
-                    data[last_start_x:last_end_x, start_y:last_start_y].reshape(-1,)) + list(data[last_start_x:last_end_x, last_end_y:end_y].reshape(-1,))
+                last_start_x, last_end_x, last_start_y, last_end_y = indices[4 - i]
+                this_data_block = list(data[start_x:last_start_x, start_y:end_y].reshape(-1, )) + list(
+                    data[last_end_x:end_x, start_y:end_y].reshape(-1, )) + list(
+                    data[last_start_x:last_end_x, start_y:last_start_y].reshape(-1, )) + list(
+                    data[last_start_x:last_end_x, last_end_y:end_y].reshape(-1, ))
                 pattern_data.append(this_data_block)
 
         return pattern_data
@@ -333,11 +332,11 @@ class UCF101DataSet(Dataset):
         pattern_data = []
 
         start_x = 0
-        for i in range(2):
+        for _ in range(2):
             start_y = 0
-            end_x = min(int(0.5*x) + start_x, x)
-            for j in range(2):
-                end_y = min((int(0.5*x) + start_y), y)
+            end_x = min(int(0.5 * x) + start_x, x)
+            for _ in range(2):
+                end_y = min((int(0.5 * x) + start_y), y)
                 indices = [(idx_x, idx_y) for idx_x in range(start_x, end_x)
                            for idx_y in range(start_y, end_y)]
                 if start_x == start_y:
@@ -354,17 +353,3 @@ class UCF101DataSet(Dataset):
             start_x = end_x
 
         return pattern_data
-
-
-'''
-trainset = UCF101DataSet(framelist_file='list/rgb_list.list', v_flow_list_file='list/v_flow_list.list', u_flow_list_file='list/u_flow_list.list',clip_len=16, crop_size=112,split="training")
-
-trainset = UCF101DataSet(framelist_file='list/rgb_list.list', clip_len=16, crop_size=112,split="training")
-
-
-for i, data in enumerate(trainset):
-	print(data['label'])
-	if i == 9:
-		break
-'''
-

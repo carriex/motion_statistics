@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 # input: N x 3 x  16 x 112 x 112
 # N X C X D X H X W
 # torch.nn.conv3d(in_channels, out_channels, kernel_size, stride=1,padding=0)
@@ -32,7 +33,7 @@ class C3D(nn.Module):
 
         self.pool5 = nn.MaxPool3d((2, 2, 2), ceil_mode=True)
 
-        self.fc1 = nn.Linear(256*1*4*4, 2048)  # 2048/4096
+        self.fc1 = nn.Linear(256 * 1 * 4 * 4, 2048)  # 2048/4096
 
         self.fc2 = nn.Linear(2048, 2048)
 
@@ -40,7 +41,6 @@ class C3D(nn.Module):
         self.out = nn.Linear(2048, num_classes)
 
         self.dropout = nn.Dropout(p=0.5)
-
 
         self.init_weights()
 
@@ -51,7 +51,7 @@ class C3D(nn.Module):
         x = self.pool3(F.relu(self.conv3(x)))
         x = self.pool4(F.relu(self.conv4(x)))
         x = self.pool5(F.relu(self.conv5(x)))
-        x = x.view(-1, 256*1*4*4)
+        x = x.view(-1, 256 * 1 * 4 * 4)
         x = F.relu(self.fc1(x))
         if self.pretrain == False:
             x = self.dropout(x)
@@ -72,9 +72,9 @@ class C3D(nn.Module):
                 if name == 'out':
                     nn.init.constant_(m.bias, 0.0)
                     if self.pretrain == True:
-                    	nn.init.normal_(m.weight, std=0.01)
+                        nn.init.normal_(m.weight, std=0.01)
                     else:
-                    	nn.init.normal_(m.weight, std=0.005)
+                        nn.init.normal_(m.weight, std=0.005)
                 else:
                     nn.init.constant_(m.bias, 1.0)
                     nn.init.normal_(m.weight, std=0.005)
@@ -98,10 +98,3 @@ class C3D(nn.Module):
         for name, param in self.named_parameters():
             if 'conv' not in name and 'bias' in name and param.requires_grad:
                 yield param
-
-
-
-
-
-
-

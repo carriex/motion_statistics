@@ -4,19 +4,16 @@ import torch
 import model
 import numpy as np
 import os
-import datetime 
+import datetime
 import constant
 from dataset import UCF101DataSet
 from utils import get_default_device
 from tensorboardX import SummaryWriter
 
-
 os.environ["CUDA_VISIBLE_DEVICES"] = '3'
 
 
-
 def train():
-
     # initialize the model
     model_path = os.path.join(constant.MODEL_DIR, constant.PRETRAINED_MODEL)
     c3d = model.C3D(constant.NUM_CLASSES)
@@ -42,11 +39,10 @@ def train():
 
     print(c3d.state_dict())
 
-
     train_params = [{'params': c3d.get_conv_1x_lr_param(), 'weight_decay': constant.WEIGHT_DECAY},
                     {'params': c3d.get_conv_2x_lr_param(), 'lr': constant.BASE_LR * 2},
-                    {'params': c3d.get_fc_1x_lr_param(), 'weight_decay':constant.WEIGHT_DECAY},
-                    {'params': c3d.get_fc_2x_lr_param(), 'lr':constant.BASE_LR *2}]
+                    {'params': c3d.get_fc_1x_lr_param(), 'weight_decay': constant.WEIGHT_DECAY},
+                    {'params': c3d.get_fc_2x_lr_param(), 'lr': constant.BASE_LR * 2}]
 
     # import input data
     trainset = UCF101DataSet(framelist_file=constant.TRAIN_LIST, clip_len=constant.CLIP_LENGTH,
@@ -64,7 +60,7 @@ def train():
     # define optimizer
     optimizer = optim.SGD(train_params, lr=constant.BASE_LR,
                           momentum=constant.MOMENTUM, weight_decay=0)
-    
+
     print(optimizer.state_dict())
     # define lr schedule
 
@@ -89,7 +85,6 @@ def train():
             loss.backward()
             optimizer.step()
 
-
             running_loss += loss.item()
             print('Step %d, loss: %.3f' % (i, loss.item()))
             writer.add_scalar('Train/Loss', loss.item(), step)
@@ -112,7 +107,7 @@ def train():
                 running_accuracy = 0.0
             if step % 10000 == 9999:
                 torch.save(c3d.state_dict(), os.path.join(
-                    constant.MODEL_DIR, '%s-%s-%d' % (constant.TRAIN_MODEL_NAME, datetime.date.today(), step+1)))
+                    constant.MODEL_DIR, '%s-%s-%d' % (constant.TRAIN_MODEL_NAME, datetime.date.today(), step + 1)))
 
     print('Finished Training')
     writer.close()

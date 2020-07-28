@@ -10,8 +10,8 @@ import constant
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '2'
 
-def eval():
 
+def eval():
     model_path = os.path.join(constant.MODEL_DIR, constant.TRAINED_MODEL)
     device = get_default_device()
     c3d = model.C3D(constant.NUM_CLASSES)
@@ -19,7 +19,6 @@ def eval():
     c3d.to(device, non_blocking=True, dtype=torch.float)
     c3d.eval()
     print(model_path)
-
 
     testset = UCF101DataSet(framelist_file=constant.TEST_LIST,
                             clip_len=constant.CLIP_LENGTH,
@@ -45,7 +44,7 @@ def eval():
 
     total_accuracy = np.array(total_accuracy)
     total_predict_label = np.array(total_predict_label)
-    
+
     print(model_path)
     print("Final accuracy", np.mean(total_accuracy))
 
