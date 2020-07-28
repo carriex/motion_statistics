@@ -1,6 +1,6 @@
 # motion_statistics
-PyTorch implementation of [self-supervised learning with motion statistics labels](https://arxiv.org/abs/1904.03597).
-This implementation only uses the motion statistics mentioned in the paper.
+PyTorch implementation of [Self-supervised Spatio-temporal Representation Learning for Videos by Predicting Motion and Appearance Statistics](https://arxiv.org/abs/1904.03597).
+
 
 ## Prerequisites 
 1. Clone the repo 
@@ -24,7 +24,7 @@ $ pip install -r requirements.txt
 
 ### Train
 
-First train with motion statistics.
+First train with motion statistics. Note: This implementation only uses the motion statistics (Session 3.2) mentioned in the paper, not the Appearance statistics (Session 3.3). 
 
 ```bash
 python train.py 
